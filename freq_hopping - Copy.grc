@@ -1,0 +1,234 @@
+options:
+  parameters:
+    author: ''
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: freq_hopping
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: Not titled yet
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: bb_gain
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: BB gain
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '10'
+    step: '10'
+    stop: '60'
+    value: var_bb_gain
+    widget: slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [616, 16.0]
+    rotation: 0
+    state: true
+- name: if_gain
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: IF gain
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '10'
+    step: '10'
+    stop: '60'
+    value: var_if_gain
+    widget: slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [312, 16.0]
+    rotation: 0
+    state: true
+- name: rf_gain
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: RF gain
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '10'
+    step: '10'
+    stop: '60'
+    value: var_rf_gain
+    widget: slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [464, 16.0]
+    rotation: 0
+    state: true
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: 20e6
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 12]
+    rotation: 0
+    state: enabled
+- name: var_bb_gain
+  id: variable
+  parameters:
+    comment: ''
+    value: '40'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [24, 368.0]
+    rotation: 0
+    state: enabled
+- name: var_if_gain
+  id: variable
+  parameters:
+    comment: ''
+    value: '40'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [24, 152.0]
+    rotation: 0
+    state: enabled
+- name: var_rf_gain
+  id: variable
+  parameters:
+    comment: ''
+    value: '60'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [24, 280.0]
+    rotation: 0
+    state: enabled
+- name: analog_noise_source_x_1
+  id: analog_noise_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: '100'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    noise_type: analog.GR_GAUSSIAN
+    seed: '0'
+    type: complex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [328, 256.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0_0
+  id: epy_block
+  parameters:
+    _source_code: "import time\nimport pmt\nfrom gnuradio import gr\nimport threading\n\
+      \nclass blk(gr.basic_block):\n    def __init__(self, hop_freqs=[100e6, 120e6,\
+      \ 150e6], hop_rate=2):\n        gr.basic_block.__init__(self,\n            name='RF\
+      \ Freq Hopper Controller',\n            in_sig=None,\n            out_sig=None)\n\
+      \        \n        self.hop_freqs = hop_freqs\n        self.hop_rate = hop_rate\n\
+      \        self.current_index = 0\n\n        self.message_port_register_out(pmt.intern('cmd'))\n\
+      \        self.thread = threading.Thread(target=self.hop_loop)\n        self.thread.daemon\
+      \ = True\n        self.thread.start()\n\n    def hop_loop(self):\n        while\
+      \ True:\n            freq = self.hop_freqs[self.current_index]\n           \
+      \ msg = pmt.cons(pmt.intern(\"freq\"), pmt.from_double(freq))\n            self.message_port_pub(pmt.intern('cmd'),\
+      \ msg)\n            self.current_index = (self.current_index + 1) % len(self.hop_freqs)\n\
+      \            time.sleep(self.hop_rate)\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    hop_freqs: '[100e6, 120e6, 150e6]'
+    hop_rate: '0.5'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('RF Freq Hopper Controller', 'blk', [('hop_freqs', '[100000000.0,
+      120000000.0, 150000000.0]'), ('hop_rate', '2')], [], [('cmd', 'message', 1)],
+      '', ['hop_freqs', 'hop_rate'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [320, 384.0]
+    rotation: 0
+    state: enabled
+- name: qtgui_sink_x_0
+  id: qtgui_sink_x
+  parameters:
+    affinity: ''
+    alias: ''
+    bw: 20e6
+    comment: ''
+    fc: '0'
+    fftsize: '1024'
+    gui_hint: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    name: '""'
+    plotconst: 'False'
+    plotfreq: 'True'
+    plottime: 'False'
+    plotwaterfall: 'False'
+    rate: '10'
+    showports: 'True'
+    showrf: 'True'
+    type: complex
+    wintype: window.WIN_BLACKMAN_hARRIS
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [664, 224.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [analog_noise_source_x_1, '0', qtgui_sink_x_0, '0']
+- [epy_block_0_0, cmd, qtgui_sink_x_0, freq]
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.10.0
